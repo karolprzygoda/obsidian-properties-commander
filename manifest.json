@@ -6,6 +6,6 @@
   "description": "Advanced properties management for Obsidian - Add, Remove, and Edit properties across files and folders with ease.",
   "author": "Karol Przygoda",
   "authorUrl": "https://github.com/karolprzygoda",
-  "isDesktopOnly": false,
+  "isDesktopOnly": true,
   "main": "main.js"
 }
