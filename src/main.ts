@@ -107,7 +107,6 @@ class FileSelectionModal extends Modal {
     super(plugin.app);
     this.plugin = plugin;
     this.action = action;
-    this.modalEl.addClass('properties-modal');
   }
 
   onOpen() {
@@ -317,7 +316,6 @@ abstract class BasePropertiesModal extends Modal {
       depthLevel: -1,
     };
     this.existingProperties = new Map();
-    this.modalEl.addClass('properties-modal');
   }
 
   async onOpen() {
