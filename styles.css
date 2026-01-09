@@ -206,6 +206,7 @@
   grid-template-columns: 40px 1fr 50px 100px 1fr;
   gap: 12px;
   padding: 10px 14px;
+  padding-bottom: 0;
   font-size: 0.8em;
   font-weight: 600;
   color: var(--text-muted);
@@ -235,6 +236,12 @@
   opacity: 0.6;
   transition: opacity 0.15s ease;
   min-width: 580px;
+}
+
+.properties-commander-edit-row > div,
+.properties-commander-edit-row > span,
+.properties-commander-edit-row input {
+  min-width: 0;
 }
 
 .properties-commander-edit-row:last-child {
