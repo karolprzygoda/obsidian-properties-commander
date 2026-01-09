@@ -2,13 +2,8 @@
    Properties Commander - Obsidian Plugin Styles
    ============================================================================ */
 
-/* Modal Base */
-.properties-commander-modal {
-  padding: 0;
-}
-
 .properties-commander-modal h2 {
-  margin: 16px 0 0 0;
+  margin: 0.75em 0 0 0;
   padding: 0 0 12px 0 !important;
   font-size: 1.4em;
   font-weight: 600;
@@ -192,11 +187,6 @@
   font-size: 0.9em;
 }
 
-/* Selection Content */
-.properties-commander-selection-content {
-  margin: 16px 0;
-}
-
 /* Button Row */
 .properties-commander-button-row {
   display: flex;
@@ -213,7 +203,7 @@
 /* Header Row */
 .properties-commander-edit-header {
   display: grid;
-  grid-template-columns: 40px 165px 120px 1fr;
+  grid-template-columns: 40px 1fr 50px 100px 1fr;
   gap: 12px;
   padding: 10px 14px;
   font-size: 0.8em;
@@ -221,6 +211,8 @@
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  text-wrap: nowrap;
+  min-width: 580px;
 }
 
 /* Edit List Container */
@@ -235,14 +227,14 @@
 /* Edit Row */
 .properties-commander-edit-row {
   display: grid;
-  grid-template-columns: 40px 1fr 120px 1fr;
+  grid-template-columns: 40px 1fr 50px 100px 1fr;
   gap: 12px;
   align-items: center;
   padding: 10px 14px;
   border-bottom: 1px solid var(--background-modifier-border);
   opacity: 0.6;
   transition: opacity 0.15s ease;
-  min-width: 524px;
+  min-width: 580px;
 }
 
 .properties-commander-edit-row:last-child {
@@ -310,4 +302,35 @@
 .properties-setting-item-toggle-container {
   padding: 16px 0;
   border-top: none;
+}
+
+.setting-item:first-child {
+  padding-top: 0.75em;
+}
+
+/* Update Toggle Cell */
+.properties-commander-edit-cell-update {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Disabled State for Type/Value when Update is off */
+.properties-commander-disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.properties-commander-disabled input,
+.properties-commander-disabled select,
+.properties-commander-disabled .checkbox-container {
+  cursor: not-allowed;
+}
+
+@media screen and (max-width: 599px) {
+  .properties-commander-modal {
+    align-self: flex-end;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
 }
