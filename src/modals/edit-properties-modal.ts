@@ -246,7 +246,7 @@ export class EditPropertiesModal extends BasePropertiesModal {
     );
 
     if (!hasValidEdit) {
-      new Notice('Please rename a property or enable "Update" to change values');
+      new Notice('Please rename a property');
       return;
     }
 
