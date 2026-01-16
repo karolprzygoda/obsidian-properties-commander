@@ -122,7 +122,7 @@ export class PropertyUtils {
   }
 
   /**
-   * Rename a property key in a file's frontmatter
+   * Rename a property key in a file's frontmatter (preserves order)
    */
   async renamePropertyKey(file: TFile, oldKey: string, newKey: string): Promise<boolean> {
     let renamed = false;
@@ -130,8 +130,27 @@ export class PropertyUtils {
     try {
       await this.app.fileManager.processFrontMatter(file, (frontmatter: Record<string, unknown>) => {
         if (oldKey in frontmatter) {
-          frontmatter[newKey] = frontmatter[oldKey];
-          delete frontmatter[oldKey];
+          // Preserve order by rebuilding the object
+          const keys = Object.keys(frontmatter);
+          const entries: [string, unknown][] = [];
+
+          for (const key of keys) {
+            if (key === oldKey) {
+              // Replace old key with new key at the same position
+              entries.push([newKey, frontmatter[oldKey]]);
+            } else {
+              entries.push([key, frontmatter[key]]);
+            }
+          }
+
+          // Clear and rebuild frontmatter in order
+          for (const key of keys) {
+            delete frontmatter[key];
+          }
+          for (const [key, value] of entries) {
+            frontmatter[key] = value;
+          }
+
           renamed = true;
         }
       });
