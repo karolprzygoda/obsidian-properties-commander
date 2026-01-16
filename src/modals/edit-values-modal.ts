@@ -121,10 +121,6 @@ export class EditValuesModal extends BasePropertiesModal {
 
     // Enable toggle
     const toggleContainer = rowEl.createDiv({ cls: 'properties-commander-values-cell-toggle' });
-    new ToggleComponent(toggleContainer).setValue(edit.enabled).onChange((value) => {
-      edit.enabled = value;
-      rowEl.toggleClass('properties-commander-values-row-enabled', value);
-    });
 
     // Property key (read-only)
     const keyContainer = rowEl.createDiv({ cls: 'properties-commander-values-cell-key' });
@@ -135,7 +131,7 @@ export class EditValuesModal extends BasePropertiesModal {
 
     // Type dropdown
     const typeContainer = rowEl.createDiv({ cls: 'properties-commander-values-cell-type' });
-    new DropdownComponent(typeContainer)
+    const typeDropdown = new DropdownComponent(typeContainer)
       .addOption('text', 'Text')
       .addOption('number', 'Number')
       .addOption('checkbox', 'Checkbox')
@@ -152,6 +148,20 @@ export class EditValuesModal extends BasePropertiesModal {
     // Value input
     const valueContainer = rowEl.createDiv({ cls: 'properties-commander-values-cell-value' });
     this.updateValueCell(valueContainer, edit);
+
+    // Set initial disabled state
+    typeDropdown.setDisabled(!edit.enabled);
+    typeContainer.toggleClass('properties-commander-disabled', !edit.enabled);
+    valueContainer.toggleClass('properties-commander-disabled', !edit.enabled);
+
+    // Toggle component (created after inputs so we can reference them)
+    new ToggleComponent(toggleContainer).setValue(edit.enabled).onChange((value) => {
+      edit.enabled = value;
+      rowEl.toggleClass('properties-commander-values-row-enabled', value);
+      typeDropdown.setDisabled(!value);
+      typeContainer.toggleClass('properties-commander-disabled', !value);
+      valueContainer.toggleClass('properties-commander-disabled', !value);
+    });
   }
 
   private updateValueCell(container: HTMLElement, edit: PropertyValueEdit) {

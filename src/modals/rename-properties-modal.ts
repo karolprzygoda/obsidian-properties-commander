@@ -101,10 +101,6 @@ export class RenamePropertiesModal extends BasePropertiesModal {
 
     // Enable toggle
     const toggleContainer = rowEl.createDiv({ cls: 'properties-commander-rename-cell-toggle' });
-    new ToggleComponent(toggleContainer).setValue(rename.enabled).onChange((value) => {
-      rename.enabled = value;
-      rowEl.toggleClass('properties-commander-rename-row-enabled', value);
-    });
 
     // Current property name (read-only)
     const currentContainer = rowEl.createDiv({ cls: 'properties-commander-rename-cell-current' });
@@ -115,12 +111,24 @@ export class RenamePropertiesModal extends BasePropertiesModal {
 
     // New property name (editable)
     const newContainer = rowEl.createDiv({ cls: 'properties-commander-rename-cell-new' });
-    new TextComponent(newContainer)
+    const newKeyInput = new TextComponent(newContainer)
       .setValue(rename.newKey)
       .setPlaceholder('New property name')
       .onChange((value) => {
         rename.newKey = value.trim();
       });
+
+    // Set initial disabled state
+    newKeyInput.setDisabled(!rename.enabled);
+    newContainer.toggleClass('properties-commander-disabled', !rename.enabled);
+
+    // Toggle component (created after inputs so we can reference them)
+    new ToggleComponent(toggleContainer).setValue(rename.enabled).onChange((value) => {
+      rename.enabled = value;
+      rowEl.toggleClass('properties-commander-rename-row-enabled', value);
+      newKeyInput.setDisabled(!value);
+      newContainer.toggleClass('properties-commander-disabled', !value);
+    });
   }
 
   protected onPropertiesReloaded() {

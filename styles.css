@@ -385,6 +385,18 @@
   padding-top: 0.75em;
 }
 
+/* Disabled state for inputs when toggle is off */
+.properties-commander-disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.properties-commander-disabled input,
+.properties-commander-disabled select,
+.properties-commander-disabled .checkbox-container {
+  cursor: not-allowed;
+}
+
 @media screen and (max-width: 599px) {
   .properties-commander-modal {
     align-self: flex-end;
