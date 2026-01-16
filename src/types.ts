@@ -3,13 +3,13 @@
  */
 
 // Property action types for modal operations
-export type PropertyAction = 'add' | 'remove' | 'edit';
+export type PropertyAction = 'add' | 'remove' | 'rename' | 'edit-values';
 
 // Supported property value types in Obsidian frontmatter
 export type PropertyValueType = 'text' | 'number' | 'checkbox' | 'date' | 'list';
 
-// Union type for all possible property values
-export type PropertyValue = string | number | boolean | string[];
+// Union type for all possible property values (including null for empty properties)
+export type PropertyValue = string | number | boolean | string[] | null;
 
 // Definition for a property to be added/edited
 export interface PropertyDefinition {
@@ -31,12 +31,17 @@ export interface ExistingProperty {
   types: Set<PropertyValueType>;
 }
 
-// Edit state for a single property in the edit modal
-export interface PropertyEdit {
+// Rename state for a single property
+export interface PropertyRename {
   originalKey: string;
   newKey: string;
   enabled: boolean;
-  updateValue: boolean; // Whether to update the value (vs just rename)
+}
+
+// Edit value state for a single property
+export interface PropertyValueEdit {
+  key: string;
+  enabled: boolean;
   type: PropertyValueType;
   value: PropertyValue;
   originalValue: PropertyValue;

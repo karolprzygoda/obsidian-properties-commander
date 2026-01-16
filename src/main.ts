@@ -1,6 +1,12 @@
 import { Menu, Plugin, TAbstractFile, TFile, TFolder } from 'obsidian';
-import { AddPropertiesModal, EditPropertiesModal, FileSelectionModal, RemovePropertiesModal } from './modals';
-import { PropertyUtils } from './utils';
+import {
+  AddPropertiesModal,
+  EditValuesModal,
+  FileSelectionModal,
+  RemovePropertiesModal,
+  RenamePropertiesModal,
+} from './modals';
+import { PropertyUtils } from './utils/property-utils';
 
 /**
  * Properties Commander - Advanced frontmatter properties management for Obsidian
@@ -51,6 +57,16 @@ export default class PropertiesCommanderPlugin extends Plugin {
   }
 
   private addPropertiesCommanderMenu(menu: Menu, file: TAbstractFile) {
+    // Only show for markdown files or folders containing markdown files
+    if (file instanceof TFile) {
+      if (file.extension !== 'md') return;
+    } else if (file instanceof TFolder) {
+      const mdFiles = this.propertyUtils.getFilesFromFolder(file, true, -1);
+      if (mdFiles.length === 0) return;
+    } else {
+      return;
+    }
+
     menu.addSeparator();
 
     menu.addItem((item) => {
@@ -60,7 +76,7 @@ export default class PropertiesCommanderPlugin extends Plugin {
 
       if (file instanceof TFolder) {
         this.addFolderMenuItems(subMenu, file);
-      } else if (file instanceof TFile && file.extension === 'md') {
+      } else if (file instanceof TFile) {
         this.addFileMenuItems(subMenu, file);
       }
     });
@@ -87,13 +103,25 @@ export default class PropertiesCommanderPlugin extends Plugin {
         });
     });
 
+    subMenu.addSeparator();
+
     subMenu.addItem((subItem) => {
       subItem
-        .setTitle('Edit properties...')
+        .setTitle('Rename properties...')
         .setIcon('pencil')
         .onClick(() => {
           const files = this.propertyUtils.getFilesFromFolder(folder, true, -1);
-          new EditPropertiesModal(this.propertyUtils, files, folder).open();
+          new RenamePropertiesModal(this.propertyUtils, files, folder).open();
+        });
+    });
+
+    subMenu.addItem((subItem) => {
+      subItem
+        .setTitle('Edit property values...')
+        .setIcon('form-input')
+        .onClick(() => {
+          const files = this.propertyUtils.getFilesFromFolder(folder, true, -1);
+          new EditValuesModal(this.propertyUtils, files, folder).open();
         });
     });
   }
@@ -117,12 +145,23 @@ export default class PropertiesCommanderPlugin extends Plugin {
         });
     });
 
+    subMenu.addSeparator();
+
     subMenu.addItem((subItem) => {
       subItem
-        .setTitle('Edit properties...')
+        .setTitle('Rename properties...')
         .setIcon('pencil')
         .onClick(() => {
-          new EditPropertiesModal(this.propertyUtils, [file]).open();
+          new RenamePropertiesModal(this.propertyUtils, [file]).open();
+        });
+    });
+
+    subMenu.addItem((subItem) => {
+      subItem
+        .setTitle('Edit property values...')
+        .setIcon('form-input')
+        .onClick(() => {
+          new EditValuesModal(this.propertyUtils, [file]).open();
         });
     });
   }
@@ -157,12 +196,23 @@ export default class PropertiesCommanderPlugin extends Plugin {
           });
       });
 
+      subMenu.addSeparator();
+
       subMenu.addItem((subItem) => {
         subItem
-          .setTitle(`Edit properties in ${mdFiles.length} files...`)
+          .setTitle(`Rename properties in ${mdFiles.length} files...`)
           .setIcon('pencil')
           .onClick(() => {
-            new EditPropertiesModal(this.propertyUtils, mdFiles).open();
+            new RenamePropertiesModal(this.propertyUtils, mdFiles).open();
+          });
+      });
+
+      subMenu.addItem((subItem) => {
+        subItem
+          .setTitle(`Edit property values in ${mdFiles.length} files...`)
+          .setIcon('form-input')
+          .onClick(() => {
+            new EditValuesModal(this.propertyUtils, mdFiles).open();
           });
       });
     });
@@ -186,9 +236,15 @@ export default class PropertiesCommanderPlugin extends Plugin {
     });
 
     this.addCommand({
-      id: 'edit-properties',
-      name: 'Edit properties...',
-      callback: () => new FileSelectionModal(this.propertyUtils, 'edit').open(),
+      id: 'rename-properties',
+      name: 'Rename properties...',
+      callback: () => new FileSelectionModal(this.propertyUtils, 'rename').open(),
+    });
+
+    this.addCommand({
+      id: 'edit-property-values',
+      name: 'Edit property values...',
+      callback: () => new FileSelectionModal(this.propertyUtils, 'edit-values').open(),
     });
   }
 }

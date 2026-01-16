@@ -114,6 +114,7 @@ export abstract class BasePropertiesModal extends Modal {
         }
 
         const prop = this.existingProperties.get(key)!;
+        // Add the value (including null for empty properties)
         prop.values.add(value);
         prop.types.add(this.propertyUtils.detectValueType(value));
       }

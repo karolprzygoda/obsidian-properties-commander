@@ -30,7 +30,7 @@ export class PropertyUtils {
   }
 
   /**
-   * Get all properties from a file's frontmatter
+   * Get all properties from a file's frontmatter (including empty/null values)
    */
   async getPropertiesFromFile(file: TFile): Promise<Record<string, PropertyValue>> {
     const properties: Record<string, PropertyValue> = {};
@@ -51,9 +51,10 @@ export class PropertyUtils {
   }
 
   /**
-   * Type guard for PropertyValue
+   * Type guard for PropertyValue (includes null for empty properties)
    */
   isPropertyValue(value: unknown): value is PropertyValue {
+    if (value === null) return true; // Allow null/empty properties
     if (typeof value === 'string') return true;
     if (typeof value === 'number') return true;
     if (typeof value === 'boolean') return true;
@@ -65,6 +66,7 @@ export class PropertyUtils {
    * Detect the type of a property value
    */
   detectValueType(value: PropertyValue): PropertyValueType {
+    if (value === null) return 'text'; // Default to text for empty properties
     if (typeof value === 'boolean') return 'checkbox';
     if (typeof value === 'number') return 'number';
     if (Array.isArray(value)) return 'list';

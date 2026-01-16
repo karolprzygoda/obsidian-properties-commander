@@ -2,9 +2,10 @@ import { ButtonComponent, Modal, Notice, Setting, TFile, TFolder, ToggleComponen
 import type { FolderOptions, PropertyAction } from '../types';
 import { PropertyUtils } from '../utils/property-utils';
 import { AddPropertiesModal } from './add-properties-modal';
-import { EditPropertiesModal } from './edit-properties-modal';
+import { EditValuesModal } from './edit-values-modal';
 import { FolderPickerModal } from './folder-picker-modal';
 import { RemovePropertiesModal } from './remove-properties-modal';
+import { RenamePropertiesModal } from './rename-properties-modal';
 
 /**
  * Modal for selecting files or folders before property operations
@@ -33,11 +34,12 @@ export class FileSelectionModal extends Modal {
     contentEl.empty();
 
     const actionName =
-      this.action === 'add' ? 'Add Properties'
-      : this.action === 'remove' ? 'Remove Properties'
-      : 'Edit Properties';
+      this.action === 'add' ? 'Add properties'
+      : this.action === 'remove' ? 'Remove properties'
+      : this.action === 'rename' ? 'Rename properties'
+      : 'Edit property values';
 
-    contentEl.createEl('h2', { text: `${actionName} - Select Target` });
+    contentEl.createEl('h2', { text: `${actionName} - Select target` });
     contentEl.createEl('p', {
       text: 'Choose files or a folder to operate on',
       cls: 'properties-commander-subtitle',
@@ -201,8 +203,11 @@ export class FileSelectionModal extends Modal {
       case 'remove':
         new RemovePropertiesModal(this.propertyUtils, files, folder).open();
         break;
-      case 'edit':
-        new EditPropertiesModal(this.propertyUtils, files, folder).open();
+      case 'rename':
+        new RenamePropertiesModal(this.propertyUtils, files, folder).open();
+        break;
+      case 'edit-values':
+        new EditValuesModal(this.propertyUtils, files, folder).open();
         break;
     }
   }

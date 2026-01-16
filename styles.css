@@ -40,6 +40,10 @@
   margin-bottom: 12px;
 }
 
+.properties-commander-selection-content {
+  margin-bottom: 16px;
+}
+
 .properties-commander-file-count {
   margin-top: 12px;
   padding: 8px 12px;
@@ -197,13 +201,20 @@
 }
 
 /* ============================================================================
-   Edit Properties Modal - Grid Layout
+   Rename Properties Modal - Grid Layout
    ============================================================================ */
 
-/* Header Row */
-.properties-commander-edit-header {
+.properties-commander-rename-list {
+  max-height: 350px;
+  overflow-y: auto;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: var(--background-secondary);
+}
+
+.properties-commander-rename-header {
   display: grid;
-  grid-template-columns: 40px 1fr 50px 100px 1fr;
+  grid-template-columns: 40px 1fr 1fr;
   gap: 12px;
   padding: 10px 14px;
   padding-bottom: 0;
@@ -213,10 +224,57 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   text-wrap: nowrap;
-  min-width: 580px;
+  min-width: 350px;
 }
 
-/* Edit List Container */
+.properties-commander-rename-row {
+  display: grid;
+  grid-template-columns: 40px 1fr 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  opacity: 0.6;
+  transition: opacity 0.15s ease;
+  min-width: 350px;
+}
+
+.properties-commander-rename-row:last-child {
+  border-bottom: none;
+}
+
+.properties-commander-rename-row-enabled {
+  opacity: 1;
+  background: var(--background-primary-alt);
+}
+
+.properties-commander-rename-cell-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.properties-commander-rename-cell-current {
+  display: flex;
+  align-items: center;
+}
+
+.properties-commander-rename-key {
+  font-family: var(--font-monospace);
+  font-weight: 500;
+  font-size: 0.9em;
+  color: var(--text-normal);
+}
+
+.properties-commander-rename-cell-new {
+  display: flex;
+  align-items: center;
+}
+
+/* ============================================================================
+   Edit Values Modal - Grid Layout
+   ============================================================================ */
+
 .properties-commander-edit-list {
   max-height: 350px;
   overflow-y: auto;
@@ -225,76 +283,89 @@
   background: var(--background-secondary);
 }
 
-/* Edit Row */
-.properties-commander-edit-row {
+.properties-commander-values-header {
   display: grid;
-  grid-template-columns: 40px 1fr 50px 100px 1fr;
+  grid-template-columns: 40px 1fr 100px 1fr;
+  gap: 12px;
+  padding: 10px 14px;
+  padding-bottom: 0;
+  font-size: 0.8em;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-wrap: nowrap;
+  min-width: 480px;
+}
+
+.properties-commander-values-row {
+  display: grid;
+  grid-template-columns: 40px 1fr 100px 1fr;
   gap: 12px;
   align-items: center;
   padding: 10px 14px;
   border-bottom: 1px solid var(--background-modifier-border);
   opacity: 0.6;
   transition: opacity 0.15s ease;
-  min-width: 580px;
+  min-width: 480px;
 }
 
-.properties-commander-edit-row > div,
-.properties-commander-edit-row > span,
-.properties-commander-edit-row input {
+.properties-commander-values-row > div,
+.properties-commander-values-row > span,
+.properties-commander-values-row input {
   min-width: 0;
 }
 
-.properties-commander-edit-row:last-child {
+.properties-commander-values-row:last-child {
   border-bottom: none;
 }
 
-.properties-commander-edit-row-enabled {
+.properties-commander-values-row-enabled {
   opacity: 1;
   background: var(--background-primary-alt);
 }
 
-/* Edit Row Cells */
-.properties-commander-edit-cell-toggle {
+.properties-commander-values-cell-toggle {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.properties-commander-edit-cell-key {
+.properties-commander-values-cell-key {
   display: flex;
   align-items: center;
 }
 
-.properties-commander-key-label {
+.properties-commander-values-key {
   font-family: var(--font-monospace);
   font-weight: 500;
   font-size: 0.9em;
   color: var(--text-normal);
 }
 
-.properties-commander-edit-cell-type {
+.properties-commander-values-cell-type {
   display: flex;
   align-items: center;
 }
 
-.properties-commander-edit-cell-type select {
+.properties-commander-values-cell-type select {
   width: 100%;
 }
 
-.properties-commander-edit-cell-value {
+.properties-commander-values-cell-value {
   display: flex;
   align-items: center;
 }
 
-.properties-commander-edit-cell-value input,
-.properties-commander-edit-cell-value .setting-item-control {
+.properties-commander-values-cell-value input,
+.properties-commander-values-cell-value .setting-item-control {
   width: 100%;
 }
 
 /* Make text inputs full width in value cell */
-.properties-commander-edit-cell-value input[type='text'],
-.properties-commander-edit-cell-value input[type='number'],
-.properties-commander-edit-cell-value input[type='date'] {
+.properties-commander-values-cell-value input[type='text'],
+.properties-commander-values-cell-value input[type='number'],
+.properties-commander-values-cell-value input[type='date'] {
   width: 100%;
   padding: 6px 10px;
   border-radius: 4px;
@@ -307,31 +378,11 @@
 }
 
 .properties-setting-item-toggle-container {
-  padding: 16px 0;
-  border-top: none;
+  border-top: none !important	;
 }
 
 .setting-item:first-child {
   padding-top: 0.75em;
-}
-
-/* Update Toggle Cell */
-.properties-commander-edit-cell-update {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Disabled State for Type/Value when Update is off */
-.properties-commander-disabled {
-  opacity: 0.4;
-  pointer-events: none;
-}
-
-.properties-commander-disabled input,
-.properties-commander-disabled select,
-.properties-commander-disabled .checkbox-container {
-  cursor: not-allowed;
 }
 
 @media screen and (max-width: 599px) {

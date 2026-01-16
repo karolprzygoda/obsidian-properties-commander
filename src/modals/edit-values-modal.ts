@@ -8,15 +8,15 @@ import {
   TFolder,
   ToggleComponent,
 } from 'obsidian';
-import type { PropertyEdit, PropertyValue, PropertyValueType } from '../types';
+import type { PropertyValue, PropertyValueEdit, PropertyValueType } from '../types';
 import { PropertyUtils } from '../utils/property-utils';
 import { BasePropertiesModal } from './base-properties-modal';
 
 /**
- * Modal for editing existing properties in files
+ * Modal for editing property values in files
  */
-export class EditPropertiesModal extends BasePropertiesModal {
-  private propertyEdits: Map<string, PropertyEdit> = new Map();
+export class EditValuesModal extends BasePropertiesModal {
+  private propertyEdits: Map<string, PropertyValueEdit> = new Map();
   private addToFilesWithoutProperty: boolean = false;
   private listContainer: HTMLElement | null = null;
 
@@ -25,9 +25,9 @@ export class EditPropertiesModal extends BasePropertiesModal {
   }
 
   renderContent(container: HTMLElement) {
-    container.createEl('h2', { text: 'Edit properties' });
+    container.createEl('h2', { text: 'Edit property values' });
     container.createEl('p', {
-      text: `Editing properties in ${this.files.length} file(s)`,
+      text: `Editing property values in ${this.files.length} file(s)`,
       cls: 'properties-commander-subtitle',
     });
 
@@ -67,7 +67,7 @@ export class EditPropertiesModal extends BasePropertiesModal {
     new ButtonComponent(buttonContainer).setButtonText('Cancel').onClick(() => this.close());
 
     new ButtonComponent(buttonContainer)
-      .setButtonText('Apply changes')
+      .setButtonText('Update values')
       .setCta()
       .onClick(() => this.handleSubmit());
   }
@@ -81,16 +81,16 @@ export class EditPropertiesModal extends BasePropertiesModal {
         // Get the most common value as default
         const valuesArray = Array.from(prop.values);
         const firstValue = valuesArray[0];
+        // Handle null/empty values - convert to empty string for editing
         const defaultValue: PropertyValue = firstValue !== undefined ? firstValue : '';
+        const editableValue: PropertyValue = defaultValue === null ? '' : defaultValue;
         const detectedType = this.propertyUtils.detectValueType(defaultValue);
 
         this.propertyEdits.set(key, {
-          originalKey: key,
-          newKey: key,
+          key,
           enabled: false,
-          updateValue: false, // By default, don't update value (only rename if key changes)
           type: detectedType,
-          value: defaultValue,
+          value: editableValue,
           originalValue: defaultValue,
         });
       });
@@ -101,56 +101,40 @@ export class EditPropertiesModal extends BasePropertiesModal {
     this.listContainer.empty();
 
     // Header row
-    const headerEl = this.listContainer.createDiv({ cls: 'properties-commander-edit-header' });
-    headerEl.createEl('span', { text: '', cls: 'properties-commander-edit-header-toggle' });
-    headerEl.createEl('span', { text: 'Property name', cls: 'properties-commander-edit-header-key' });
-    headerEl.createEl('span', { text: '', cls: 'properties-commander-edit-header-update' });
-    headerEl.createEl('span', { text: 'Type', cls: 'properties-commander-edit-header-type' });
-    headerEl.createEl('span', { text: 'Value', cls: 'properties-commander-edit-header-value' });
+    const headerEl = this.listContainer.createDiv({ cls: 'properties-commander-values-header' });
+    headerEl.createEl('span', { text: '', cls: 'properties-commander-values-header-toggle' });
+    headerEl.createEl('span', { text: 'Property', cls: 'properties-commander-values-header-key' });
+    headerEl.createEl('span', { text: 'Type', cls: 'properties-commander-values-header-type' });
+    headerEl.createEl('span', { text: 'New value', cls: 'properties-commander-values-header-value' });
 
     this.propertyEdits.forEach((edit) => {
       this.renderPropertyRow(edit);
     });
   }
 
-  private renderPropertyRow(edit: PropertyEdit) {
+  private renderPropertyRow(edit: PropertyValueEdit) {
     if (!this.listContainer) return;
 
     const rowEl = this.listContainer.createDiv({
-      cls: 'properties-commander-edit-row',
+      cls: 'properties-commander-values-row',
     });
 
-    // Enable toggle (select this property for editing)
-    const toggleContainer = rowEl.createDiv({ cls: 'properties-commander-edit-cell-toggle' });
+    // Enable toggle
+    const toggleContainer = rowEl.createDiv({ cls: 'properties-commander-values-cell-toggle' });
     new ToggleComponent(toggleContainer).setValue(edit.enabled).onChange((value) => {
       edit.enabled = value;
-      rowEl.toggleClass('properties-commander-edit-row-enabled', value);
+      rowEl.toggleClass('properties-commander-values-row-enabled', value);
     });
 
-    // Property key (editable input for renaming)
-    const keyContainer = rowEl.createDiv({ cls: 'properties-commander-edit-cell-key' });
-    new TextComponent(keyContainer)
-      .setValue(edit.newKey)
-      .setPlaceholder('Property name')
-      .onChange((value) => {
-        edit.newKey = value.trim();
-      });
-
-    // Update value toggle (whether to change the value or just rename)
-    const updateContainer = rowEl.createDiv({ cls: 'properties-commander-edit-cell-update' });
-    new ToggleComponent(updateContainer)
-      .setValue(edit.updateValue)
-      .setTooltip('Enable to update the value')
-      .onChange((value) => {
-        edit.updateValue = value;
-        // Enable/disable type and value inputs based on toggle
-        typeContainer.toggleClass('properties-commander-disabled', !value);
-        valueContainer.toggleClass('properties-commander-disabled', !value);
-      });
+    // Property key (read-only)
+    const keyContainer = rowEl.createDiv({ cls: 'properties-commander-values-cell-key' });
+    keyContainer.createEl('span', {
+      text: edit.key,
+      cls: 'properties-commander-values-key',
+    });
 
     // Type dropdown
-    const typeContainer = rowEl.createDiv({ cls: 'properties-commander-edit-cell-type' });
-    typeContainer.toggleClass('properties-commander-disabled', !edit.updateValue);
+    const typeContainer = rowEl.createDiv({ cls: 'properties-commander-values-cell-type' });
     new DropdownComponent(typeContainer)
       .addOption('text', 'Text')
       .addOption('number', 'Number')
@@ -166,12 +150,11 @@ export class EditPropertiesModal extends BasePropertiesModal {
       });
 
     // Value input
-    const valueContainer = rowEl.createDiv({ cls: 'properties-commander-edit-cell-value' });
-    valueContainer.toggleClass('properties-commander-disabled', !edit.updateValue);
+    const valueContainer = rowEl.createDiv({ cls: 'properties-commander-values-cell-value' });
     this.updateValueCell(valueContainer, edit);
   }
 
-  private updateValueCell(container: HTMLElement, edit: PropertyEdit) {
+  private updateValueCell(container: HTMLElement, edit: PropertyValueEdit) {
     container.empty();
 
     switch (edit.type) {
@@ -236,52 +219,27 @@ export class EditPropertiesModal extends BasePropertiesModal {
     const enabledEdits = Array.from(this.propertyEdits.values()).filter((e) => e.enabled);
 
     if (enabledEdits.length === 0) {
-      new Notice('Please enable at least one property to edit');
+      new Notice('Please select at least one property to update');
       return;
     }
 
-    // Validate: at least one action must be performed per enabled property
-    const hasValidEdit = enabledEdits.some(
-      (edit) => edit.updateValue || (edit.originalKey !== edit.newKey && edit.newKey.length > 0),
-    );
-
-    if (!hasValidEdit) {
-      new Notice('Please rename a property');
-      return;
-    }
-
-    let totalRenamed = 0;
     let totalUpdated = 0;
     let totalAdded = 0;
 
     for (const file of this.files) {
       for (const edit of enabledEdits) {
-        // Check if key was renamed
-        const keyRenamed = edit.originalKey !== edit.newKey && edit.newKey.length > 0;
-        const targetKey = keyRenamed ? edit.newKey : edit.originalKey;
-
-        // Rename the key if needed
-        if (keyRenamed) {
-          const renamed = await this.propertyUtils.renamePropertyKey(file, edit.originalKey, edit.newKey);
-          if (renamed) totalRenamed++;
-        }
-
-        // Update the value only if updateValue is enabled
-        if (edit.updateValue) {
-          const result = await this.propertyUtils.updatePropertyValue(
-            file,
-            targetKey,
-            edit.value,
-            this.addToFilesWithoutProperty,
-          );
-          if (result === 'updated') totalUpdated++;
-          else if (result === 'added') totalAdded++;
-        }
+        const result = await this.propertyUtils.updatePropertyValue(
+          file,
+          edit.key,
+          edit.value,
+          this.addToFilesWithoutProperty,
+        );
+        if (result === 'updated') totalUpdated++;
+        else if (result === 'added') totalAdded++;
       }
     }
 
     const messageParts: string[] = [];
-    if (totalRenamed > 0) messageParts.push(`renamed ${totalRenamed}`);
     if (totalUpdated > 0) messageParts.push(`updated ${totalUpdated}`);
     if (totalAdded > 0) messageParts.push(`added ${totalAdded}`);
 
